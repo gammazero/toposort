@@ -110,9 +110,14 @@ func makeGraph(edges []Edge) (map[interface{}][]interface{}, error) {
 			return nil, errors.New("nodes in edge cannot be the same")
 		}
 		if u == nil {
-			graph[v] = graph[v] // add empty list, or existing list
+			// Add vertex only (empty destination list)
+			if _, ok := graph[v]; !ok {
+				graph[v] = nil
+			}
 		} else if v == nil {
-			graph[u] = graph[u]
+			if _, ok := graph[u]; !ok {
+				graph[u] = nil
+			}
 		} else {
 			graph[u] = append(graph[u], v)
 		}

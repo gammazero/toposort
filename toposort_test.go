@@ -272,7 +272,7 @@ func validateClothing(clothing []Edge, sorted []interface{}) error {
 		(iShirt < iTie) &&
 		(iTie < iJacket) &&
 		(iSocks < iShoes)) {
-		errors.New("clothing items are not correctly sorted")
+		return errors.New("clothing items are not correctly sorted")
 	}
 	return nil
 }
