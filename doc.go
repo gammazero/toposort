@@ -10,7 +10,7 @@ edge (u, v) has a vertex u that is depended on by v, such that u must come
 before v.
 
 This sort finds cycles in the graph.  If the graph is determined to have a
-cycle, then the sorting is not done and an error is returned.
+cycle, then an error is returned.
 
 The result of completing a topological sort is an ordered slice of vertexes,
 where the position of every vertex in the list is before any of its destination
@@ -24,7 +24,8 @@ After sorting this graph:
  +-------> C <--------+
 
 The following conditions must be true concerning the relative position of the
-nodes in the returned list of nodes: A<B, A<C, B<D, D<E, C<D, F<C
+nodes in the returned list of nodes: A<B, A<C, B<D, D<E, C<D, F<C, F<E.  The
+slice [F A C B D E] is a correct result.
 
 When sorting this graph:
 
