@@ -287,9 +287,7 @@ func index(slice []interface{}, value string) int {
 }
 
 func shuffle(x []Edge) {
-	for i := len(x) - 1; i >= 0; i-- {
-		// Pick an element in x[:i+1] with which to exchange x[i]
-		j := int(rand.Float32() * float32(i+1))
+	rand.Shuffle(len(x), func(i, j int) {
 		x[i], x[j] = x[j], x[i]
-	}
+	})
 }
