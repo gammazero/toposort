@@ -104,7 +104,7 @@ func ToposortR(edges []Edge) ([]interface{}, error) {
 // only one vertex is added to the graph, if it is not already in the graph.
 func makeGraph(edges []Edge) (map[interface{}][]interface{}, error) {
 	graph := make(map[interface{}][]interface{}, len(edges)+1)
-	for i, _ := range edges {
+	for i := range edges {
 		u, v := edges[i][0], edges[i][1]
 		if u == v {
 			return nil, errors.New("nodes in edge cannot be the same")
