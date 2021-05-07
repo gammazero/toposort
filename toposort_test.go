@@ -25,7 +25,7 @@ func TestSimple(t *testing.T) {
 		t.Fatal("Toposort returned error:", err)
 	}
 
-	ss := make([]string, len(sorted), len(sorted))
+	ss := make([]string, len(sorted))
 	for i, n := range sorted {
 		ss[i] = n.(string)
 	}
@@ -220,7 +220,7 @@ func BenchmarkToposort(b *testing.B) {
 	shuffle(graph)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		Toposort(graph)
+		_, _ = Toposort(graph)
 	}
 }
 
