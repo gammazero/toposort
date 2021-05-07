@@ -1,13 +1,12 @@
 # toposort
 
-[![Build Status](https://travis-ci.com/gammazero/toposort.svg)](https://travis-ci.com/gammazero/toposort)
+[![GoDoc](https://godoc.org/github.com/gammazero/toposort?status.svg)](https://godoc.org/github.com/gammazero/toposort)
+[![Build Status](https://github.com/gammazero/toposort/actions/workflows/go.yml/badge.svg)](https://github.com/gammazero/toposort/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gammazero/toposort)](https://goreportcard.com/report/github.com/gammazero/toposort)
 [![codecov](https://codecov.io/gh/gammazero/toposort/branch/master/graph/badge.svg)](https://codecov.io/gh/gammazero/toposort)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Topologically sort a directed acyclic graph (DAG) with cycle detection.
-
-[![GoDoc](https://godoc.org/github.com/gammazero/toposort?status.svg)](https://godoc.org/github.com/gammazero/toposort)
 
 This topological sort can be used to put items in dependency order, where each
 edge (u, v) has a vertex u that is depended on by v, such that u must come
