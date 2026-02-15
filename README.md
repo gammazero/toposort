@@ -1,6 +1,6 @@
 # toposort
 
-[![GoDoc](https://godoc.org/github.com/gammazero/toposort?status.svg)](https://godoc.org/github.com/gammazero/toposort)
+[![GoDoc](https://pkg.go.dev/badge/github.com/gammazero/toposort)](https://pkg.go.dev/github.com/gammazero/toposort)
 [![Build Status](https://github.com/gammazero/toposort/actions/workflows/go.yml/badge.svg)](https://github.com/gammazero/toposort/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gammazero/toposort)](https://goreportcard.com/report/github.com/gammazero/toposort)
 [![codecov](https://codecov.io/gh/gammazero/toposort/branch/master/graph/badge.svg)](https://codecov.io/gh/gammazero/toposort)
