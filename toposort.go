@@ -6,7 +6,7 @@ import (
 )
 
 // Edge represents a pair of vertexes.  Each vertex is an opaque type.
-type Edge [2]interface{}
+type Edge [2]any
 
 // Toposort performs a topological sort of the DAG defined by given edges.
 //
@@ -20,15 +20,15 @@ type Edge [2]interface{}
 //
 // Returns an ordered list of vertexes where each vertex occurs before any of
 // its destination vertexes.  An error is returned if a cycle is detected.
-func Toposort(edges []Edge) ([]interface{}, error) {
+func Toposort(edges []Edge) ([]any, error) {
 	g, err := makeGraph(edges)
 	if err != nil {
 		return nil, err
 	}
-	sorted := make([]interface{}, 0, len(g))
+	sorted := make([]any, 0, len(g))
 
 	// Create map of vertexes to incoming edge count, and set counts to 0
-	inDegree := make(map[interface{}]int, len(g))
+	inDegree := make(map[any]int, len(g))
 	for n := range g {
 		inDegree[n] = 0
 	}
@@ -43,7 +43,7 @@ func Toposort(edges []Edge) ([]interface{}, error) {
 	}
 
 	// Make a list next consisting of all vertexes u such that inDegree[u] = 0
-	var next []interface{}
+	var next []any
 	for u, deg := range inDegree {
 		if deg == 0 {
 			next = append(next, u)
@@ -87,7 +87,7 @@ func Toposort(edges []Edge) ([]interface{}, error) {
 
 // ToposortR is the same as Toposort with the order of the output reversed.
 // This has the same effect as changing the vertex order of each edge.
-func ToposortR(edges []Edge) ([]interface{}, error) {
+func ToposortR(edges []Edge) ([]any, error) {
 	sorted, err := Toposort(edges)
 	if err != nil {
 		return nil, err
@@ -102,8 +102,8 @@ func ToposortR(edges []Edge) ([]interface{}, error) {
 
 // makeGraph creates a map of source node to destination nodes.  An edge with
 // only one vertex is added to the graph, if it is not already in the graph.
-func makeGraph(edges []Edge) (map[interface{}][]interface{}, error) {
-	graph := make(map[interface{}][]interface{}, len(edges)+1)
+func makeGraph(edges []Edge) (map[any][]any, error) {
+	graph := make(map[any][]any, len(edges)+1)
 	for i := range edges {
 		u, v := edges[i][0], edges[i][1]
 		if u == v {

@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestSimple(t *testing.T) {
@@ -44,7 +43,7 @@ func TestSimple(t *testing.T) {
 	iD := strings.Index(sortedString, "D")
 	iE := strings.Index(sortedString, "E")
 	iF := strings.Index(sortedString, "F")
-	if !((iA < iB) && (iA < iC) && (iB < iD) && (iD < iE) && (iC < iD) && (iF < iC)) {
+	if (iA >= iB) || (iA >= iC) || (iB >= iD) || (iD >= iE) || (iC >= iD) || (iF >= iC) {
 		t.Fatal("items are not correctly sorted")
 	}
 	t.Log("Sorted correctly:", sorted)
@@ -110,8 +109,7 @@ func TestBumstead(t *testing.T) {
 	}
 	t.Log("Sorted correctly:", sorted)
 
-	rand.Seed(time.Now().Unix())
-	for i := 0; i < 37; i++ {
+	for range 37 {
 		shuffle(clothing)
 		sorted, err := ToposortR(clothing)
 		if err != nil {
@@ -137,7 +135,7 @@ func TestBumsteadCycle(t *testing.T) {
 		{"shoes", "pants"}, {"shoes", "undershorts"}, {"shoes", "socks"},
 		{"watch", nil}}
 
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		_, err := ToposortR(clothing)
 		if err == nil {
 			t.Fatal("failed to detect cycle")
@@ -179,8 +177,7 @@ func TestLarge(t *testing.T) {
 		{"W", "Q"}, {"X", "C"}, {nil, "Y"}, {"Z", nil}}
 
 	t.Log("Sorting graph:")
-	rand.Seed(time.Now().Unix())
-	for i := 0; i < 37; i++ {
+	for range 37 {
 		shuffle(graph)
 		sorted, err := Toposort(graph)
 		if err != nil {
@@ -216,7 +213,6 @@ func BenchmarkToposort(b *testing.B) {
 		{"I", "N"}, {"J", "N"}, {"Z", "A"}, {"Y", "A"},
 		{"Y", "Z"}, {"W", "A"}, {"W", "Y"}}
 
-	rand.Seed(time.Now().Unix())
 	shuffle(graph)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -225,13 +221,13 @@ func BenchmarkToposort(b *testing.B) {
 }
 
 // validateClothing checks that Professor Bumstead dressed himself properly.
-func validateClothing(clothing []Edge, sorted []interface{}) error {
+func validateClothing(clothing []Edge, sorted []any) error {
 	// Make sure he is wearing all his clothing items.
 	for _, c := range clothing {
 		child, parent := c[0], c[1]
 		// Check the child is in sorted
 		var found bool
-		for i := 0; i < len(sorted); i++ {
+		for i := range sorted {
 			if child == sorted[i] {
 				found = true
 				break
@@ -243,7 +239,7 @@ func validateClothing(clothing []Edge, sorted []interface{}) error {
 
 		// Check that parent is nil or in sorted.
 		found = false
-		for i := 0; i < len(sorted); i++ {
+		for i := range sorted {
 			if parent == nil || parent == sorted[i] {
 				found = true
 				break
@@ -264,20 +260,20 @@ func validateClothing(clothing []Edge, sorted []interface{}) error {
 	iSocks := index(sorted, "socks")
 	iShoes := index(sorted, "shoes")
 	//iWatch := sorted.index("watch")
-	if !((iUndershorts < iPants) &&
-		(iUndershorts < iShoes) &&
-		(iPants < iShoes) &&
-		(iPants < iBelt) &&
-		(iShirt < iBelt) &&
-		(iShirt < iTie) &&
-		(iTie < iJacket) &&
-		(iSocks < iShoes)) {
+	if (iUndershorts >= iPants) ||
+		(iUndershorts >= iShoes) ||
+		(iPants >= iShoes) ||
+		(iPants >= iBelt) ||
+		(iShirt >= iBelt) ||
+		(iShirt >= iTie) ||
+		(iTie >= iJacket) ||
+		(iSocks >= iShoes) {
 		return errors.New("clothing items are not correctly sorted")
 	}
 	return nil
 }
 
-func index(slice []interface{}, value string) int {
+func index(slice []any, value string) int {
 	for p, v := range slice {
 		if v != nil && v.(string) == value {
 			return p
