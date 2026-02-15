@@ -111,7 +111,7 @@ func TestBumstead(t *testing.T) {
 	t.Log("Sorted correctly:", sorted)
 
 	rand.Seed(time.Now().Unix())
-	for i := 0; i < 37; i++ {
+	for range 37 {
 		shuffle(clothing)
 		sorted, err := ToposortR(clothing)
 		if err != nil {
@@ -137,7 +137,7 @@ func TestBumsteadCycle(t *testing.T) {
 		{"shoes", "pants"}, {"shoes", "undershorts"}, {"shoes", "socks"},
 		{"watch", nil}}
 
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		_, err := ToposortR(clothing)
 		if err == nil {
 			t.Fatal("failed to detect cycle")
@@ -180,7 +180,7 @@ func TestLarge(t *testing.T) {
 
 	t.Log("Sorting graph:")
 	rand.Seed(time.Now().Unix())
-	for i := 0; i < 37; i++ {
+	for range 37 {
 		shuffle(graph)
 		sorted, err := Toposort(graph)
 		if err != nil {
@@ -225,13 +225,13 @@ func BenchmarkToposort(b *testing.B) {
 }
 
 // validateClothing checks that Professor Bumstead dressed himself properly.
-func validateClothing(clothing []Edge, sorted []interface{}) error {
+func validateClothing(clothing []Edge, sorted []any) error {
 	// Make sure he is wearing all his clothing items.
 	for _, c := range clothing {
 		child, parent := c[0], c[1]
 		// Check the child is in sorted
 		var found bool
-		for i := 0; i < len(sorted); i++ {
+		for i := range sorted {
 			if child == sorted[i] {
 				found = true
 				break
@@ -243,7 +243,7 @@ func validateClothing(clothing []Edge, sorted []interface{}) error {
 
 		// Check that parent is nil or in sorted.
 		found = false
-		for i := 0; i < len(sorted); i++ {
+		for i := range sorted {
 			if parent == nil || parent == sorted[i] {
 				found = true
 				break
@@ -277,7 +277,7 @@ func validateClothing(clothing []Edge, sorted []interface{}) error {
 	return nil
 }
 
-func index(slice []interface{}, value string) int {
+func index(slice []any, value string) int {
 	for p, v := range slice {
 		if v != nil && v.(string) == value {
 			return p
