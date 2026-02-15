@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestSimple(t *testing.T) {
@@ -44,7 +43,7 @@ func TestSimple(t *testing.T) {
 	iD := strings.Index(sortedString, "D")
 	iE := strings.Index(sortedString, "E")
 	iF := strings.Index(sortedString, "F")
-	if !((iA < iB) && (iA < iC) && (iB < iD) && (iD < iE) && (iC < iD) && (iF < iC)) {
+	if (iA >= iB) || (iA >= iC) || (iB >= iD) || (iD >= iE) || (iC >= iD) || (iF >= iC) {
 		t.Fatal("items are not correctly sorted")
 	}
 	t.Log("Sorted correctly:", sorted)
@@ -110,7 +109,6 @@ func TestBumstead(t *testing.T) {
 	}
 	t.Log("Sorted correctly:", sorted)
 
-	rand.Seed(time.Now().Unix())
 	for range 37 {
 		shuffle(clothing)
 		sorted, err := ToposortR(clothing)
@@ -179,7 +177,6 @@ func TestLarge(t *testing.T) {
 		{"W", "Q"}, {"X", "C"}, {nil, "Y"}, {"Z", nil}}
 
 	t.Log("Sorting graph:")
-	rand.Seed(time.Now().Unix())
 	for range 37 {
 		shuffle(graph)
 		sorted, err := Toposort(graph)
@@ -216,7 +213,6 @@ func BenchmarkToposort(b *testing.B) {
 		{"I", "N"}, {"J", "N"}, {"Z", "A"}, {"Y", "A"},
 		{"Y", "Z"}, {"W", "A"}, {"W", "Y"}}
 
-	rand.Seed(time.Now().Unix())
 	shuffle(graph)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -264,14 +260,14 @@ func validateClothing(clothing []Edge, sorted []any) error {
 	iSocks := index(sorted, "socks")
 	iShoes := index(sorted, "shoes")
 	//iWatch := sorted.index("watch")
-	if !((iUndershorts < iPants) &&
-		(iUndershorts < iShoes) &&
-		(iPants < iShoes) &&
-		(iPants < iBelt) &&
-		(iShirt < iBelt) &&
-		(iShirt < iTie) &&
-		(iTie < iJacket) &&
-		(iSocks < iShoes)) {
+	if (iUndershorts >= iPants) ||
+		(iUndershorts >= iShoes) ||
+		(iPants >= iShoes) ||
+		(iPants >= iBelt) ||
+		(iShirt >= iBelt) ||
+		(iShirt >= iTie) ||
+		(iTie >= iJacket) ||
+		(iSocks >= iShoes) {
 		return errors.New("clothing items are not correctly sorted")
 	}
 	return nil
