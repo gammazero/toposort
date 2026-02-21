@@ -1,10 +1,8 @@
 package toposort
 
 import (
-	"errors"
-	"fmt"
 	"math/rand"
-	"strings"
+	"slices"
 	"testing"
 )
 
@@ -16,7 +14,7 @@ func TestSimple(t *testing.T) {
 	t.Log("|         |          |")
 	t.Log("+-------> C <--------+")
 
-	sorted, err := Toposort([]Edge{
+	sorted, err := Toposort([]Edge[string]{
 		{"B", "D"}, {"D", "E"}, {"A", "B"}, {"A", "C"},
 		{"C", "D"}, {"F", "C"}, {"F", "E"}})
 
@@ -24,25 +22,19 @@ func TestSimple(t *testing.T) {
 		t.Fatal("Toposort returned error:", err)
 	}
 
-	ss := make([]string, len(sorted))
-	for i, n := range sorted {
-		ss[i] = n.(string)
-	}
-	sortedString := strings.Join(ss, "")
-
 	// Check that all values are present in sorted list.
 	for _, v := range []string{"A", "B", "C", "D", "E", "F"} {
-		if !strings.Contains(sortedString, v) {
+		if !slices.Contains(sorted, v) {
 			t.Fatal("missing node from sorted result")
 		}
 	}
 
-	iA := strings.Index(sortedString, "A")
-	iB := strings.Index(sortedString, "B")
-	iC := strings.Index(sortedString, "C")
-	iD := strings.Index(sortedString, "D")
-	iE := strings.Index(sortedString, "E")
-	iF := strings.Index(sortedString, "F")
+	iA := slices.Index(sorted, "A")
+	iB := slices.Index(sorted, "B")
+	iC := slices.Index(sorted, "C")
+	iD := slices.Index(sorted, "D")
+	iE := slices.Index(sorted, "E")
+	iF := slices.Index(sorted, "F")
 	if (iA >= iB) || (iA >= iC) || (iB >= iD) || (iD >= iE) || (iC >= iD) || (iF >= iC) {
 		t.Fatal("items are not correctly sorted")
 	}
@@ -50,7 +42,7 @@ func TestSimple(t *testing.T) {
 }
 
 func TestOneSided(t *testing.T) {
-	sorted, err := Toposort([]Edge{
+	sorted, err := Toposort([]Edge[string]{
 		{"A", "B"}, {"A", "C"}, {"A", "D"}, {"A", "E"}, {"A", "F"}})
 	if err != nil {
 		t.Fatal(err)
@@ -61,7 +53,7 @@ func TestOneSided(t *testing.T) {
 }
 
 func TestBadNode(t *testing.T) {
-	_, err := Toposort([]Edge{{"X", "X"}})
+	_, err := Toposort([]Edge[string]{{"X", "X"}})
 	if err == nil {
 		t.Fatal("Expected error")
 	}
@@ -77,7 +69,7 @@ func TestCycle(t *testing.T) {
 	t.Log("|         |          |")
 	t.Log("+-------> C <--------+")
 	// There is a cycle: D->F->C->D
-	_, err := Toposort([]Edge{
+	_, err := Toposort([]Edge[string]{
 		{"B", "D"}, {"D", "E"}, {"A", "B"}, {"A", "C"},
 		{"C", "D"}, {"F", "C"}, {"F", "E"}, {"D", "F"}})
 	if err == nil {
@@ -89,13 +81,13 @@ func TestCycle(t *testing.T) {
 // Check that results are correct with many different edge orderings.
 func TestBumstead(t *testing.T) {
 	// Edges are (x, y) where x depends on y.  In a DAG: y-->x
-	clothing := []Edge{
+	clothing := []Edge[string]{
 		{"jacket", "tie"}, {"jacket", "belt"},
 		{"tie", "shirt"},
 		{"belt", "shirt"}, {"belt", "pants"},
 		{"pants", "undershorts"},
 		{"shoes", "pants"}, {"shoes", "undershorts"}, {"shoes", "socks"},
-		{"watch", nil}}
+		{"watch", ""}}
 
 	t.Log("Sorting Professor Bumstead's cloths:")
 	sorted, err := ToposortR(clothing)
@@ -103,10 +95,7 @@ func TestBumstead(t *testing.T) {
 		t.Fatal("Toposort returned error:", err)
 	}
 
-	err = validateClothing(clothing, sorted)
-	if err != nil {
-		t.Fatal(err)
-	}
+	validateClothing(t, clothing, sorted)
 	t.Log("Sorted correctly:", sorted)
 
 	for range 37 {
@@ -115,10 +104,7 @@ func TestBumstead(t *testing.T) {
 		if err != nil {
 			t.Fatal("Toposort returned error:", err)
 		}
-		err = validateClothing(clothing, sorted)
-		if err != nil {
-			t.Fatal(err)
-		}
+		validateClothing(t, clothing, sorted)
 		t.Log("Sorted correctly:", sorted)
 	}
 }
@@ -126,14 +112,14 @@ func TestBumstead(t *testing.T) {
 // Check that cycle is always detected, with different edge orderings.
 func TestBumsteadCycle(t *testing.T) {
 	// Edges are (x, y) where x depends on y.  In a DAG: y-->x
-	clothing := []Edge{
+	clothing := []Edge[string]{
 		{"jacket", "tie"}, {"jacket", "belt"},
 		{"tie", "shirt"},
 		{"undershorts", "shoes"},
 		{"belt", "shirt"}, {"belt", "pants"},
 		{"pants", "undershorts"},
 		{"shoes", "pants"}, {"shoes", "undershorts"}, {"shoes", "socks"},
-		{"watch", nil}}
+		{"watch", ""}}
 
 	for range 7 {
 		_, err := ToposortR(clothing)
@@ -147,7 +133,7 @@ func TestBumsteadCycle(t *testing.T) {
 // Test with multiple edges between the same vertexes.
 func TestMultiLink(t *testing.T) {
 	t.Log("Sorting multilink")
-	sorted, err := Toposort([]Edge{
+	sorted, err := Toposort([]Edge[string]{
 		{"A", "B"}, {"A", "B"}, {"A", "B"}, {"A", "C"},
 		{"A", "C"}, {"B", "C"}, {"B", "C"}, {"B", "C"},
 		{"C", "D"}, {"C", "D"}, {"B", "D"}, {"B", "D"}})
@@ -165,7 +151,7 @@ func TestMultiLink(t *testing.T) {
 
 // Large
 func TestLarge(t *testing.T) {
-	graph := []Edge{
+	graph := []Edge[string]{
 		{"A", "B"}, {"A", "C"}, {"C", "B"}, {"C", "E"},
 		{"B", "E"}, {"B", "D"}, {"B", "G"}, {"E", "K"},
 		{"E", "D"}, {"C", "D"}, {"D", "K"}, {"D", "F"},
@@ -174,7 +160,7 @@ func TestLarge(t *testing.T) {
 		{"I", "N"}, {"J", "N"}, {"O", "K"}, {"K", "P"},
 		{"Q", "R"}, {"R", "C"}, {"R", "S"}, {"S", "C"},
 		{"T", "U"}, {"U", "C"}, {"U", "V"}, {"V", "W"},
-		{"W", "Q"}, {"X", "C"}, {nil, "Y"}, {"Z", nil}}
+		{"W", "Q"}, {"X", "C"}, {"", "Y"}, {"Z", ""}}
 
 	t.Log("Sorting graph:")
 	for range 37 {
@@ -191,7 +177,7 @@ func TestLarge(t *testing.T) {
 }
 
 func TestSingleNodeEdge(t *testing.T) {
-	sorted, err := Toposort([]Edge{{"A", "B"}, {"A", "C"}, {"A", nil}})
+	sorted, err := Toposort([]Edge[string]{{"A", "B"}, {"A", "C"}, {"A", ""}})
 	if err != nil {
 		t.Fatal("Toposort returned error:", err)
 	}
@@ -204,7 +190,7 @@ func TestSingleNodeEdge(t *testing.T) {
 }
 
 func BenchmarkToposort(b *testing.B) {
-	graph := []Edge{
+	graph := []Edge[string]{
 		{"A", "B"}, {"A", "C"}, {"C", "B"}, {"C", "E"},
 		{"B", "E"}, {"B", "D"}, {"B", "G"}, {"E", "K"},
 		{"E", "D"}, {"C", "D"}, {"D", "K"}, {"D", "F"},
@@ -215,50 +201,40 @@ func BenchmarkToposort(b *testing.B) {
 
 	shuffle(graph)
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_, _ = Toposort(graph)
 	}
 }
 
 // validateClothing checks that Professor Bumstead dressed himself properly.
-func validateClothing(clothing []Edge, sorted []any) error {
+func validateClothing(t *testing.T, clothing []Edge[string], sorted []string) {
+	t.Helper()
+	t.Log("Sorted:", sorted)
 	// Make sure he is wearing all his clothing items.
 	for _, c := range clothing {
 		child, parent := c[0], c[1]
 		// Check the child is in sorted
-		var found bool
-		for i := range sorted {
-			if child == sorted[i] {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return errors.New(fmt.Sprint("missing item: ", child))
+		if !slices.Contains(sorted, child) {
+			t.Fatalf("missing child item: %q", child)
 		}
 
-		// Check that parent is nil or in sorted.
-		found = false
-		for i := range sorted {
-			if parent == nil || parent == sorted[i] {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return errors.New(fmt.Sprint("missing item: ", parent))
+		// Check that parent is "" or in sorted.
+		if !slices.ContainsFunc(sorted, func(s string) bool {
+			return parent == "" || s == parent
+		}) {
+			t.Fatalf("missing prent item: %q", parent)
 		}
 	}
 
 	// Make sure he put his clothes on in the right order.
-	iUndershorts := index(sorted, "undershorts")
-	iPants := index(sorted, "pants")
-	iBelt := index(sorted, "belt")
-	iJacket := index(sorted, "jacket")
-	iShirt := index(sorted, "shirt")
-	iTie := index(sorted, "tie")
-	iSocks := index(sorted, "socks")
-	iShoes := index(sorted, "shoes")
+	iUndershorts := slices.Index(sorted, "undershorts")
+	iPants := slices.Index(sorted, "pants")
+	iBelt := slices.Index(sorted, "belt")
+	iJacket := slices.Index(sorted, "jacket")
+	iShirt := slices.Index(sorted, "shirt")
+	iTie := slices.Index(sorted, "tie")
+	iSocks := slices.Index(sorted, "socks")
+	iShoes := slices.Index(sorted, "shoes")
 	//iWatch := sorted.index("watch")
 	if (iUndershorts >= iPants) ||
 		(iUndershorts >= iShoes) ||
@@ -268,21 +244,20 @@ func validateClothing(clothing []Edge, sorted []any) error {
 		(iShirt >= iTie) ||
 		(iTie >= iJacket) ||
 		(iSocks >= iShoes) {
-		return errors.New("clothing items are not correctly sorted")
+		t.Fatal("clothing items are not correctly sorted")
 	}
-	return nil
 }
 
-func index(slice []any, value string) int {
+func index(slice []string, value string) int {
 	for p, v := range slice {
-		if v != nil && v.(string) == value {
+		if v == value {
 			return p
 		}
 	}
 	return -1
 }
 
-func shuffle(x []Edge) {
+func shuffle(x []Edge[string]) {
 	rand.Shuffle(len(x), func(i, j int) {
 		x[i], x[j] = x[j], x[i]
 	})

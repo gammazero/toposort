@@ -15,13 +15,13 @@ func Example_clothes() {
 	// Edges are (x, y) where x depends on y.  In other words, y must be done
 	// before x.  In a DAG: y --> x.  So ToposortR is called for this reversed
 	// order.
-	sorted, err := ToposortR([]Edge{
+	sorted, err := ToposortR([]Edge[string]{
 		{"jacket", "tie"}, {"jacket", "belt"},
 		{"tie", "shirt"},
 		{"belt", "shirt"}, {"belt", "pants"},
 		{"pants", "undershorts"},
 		{"shoes", "pants"}, {"shoes", "undershorts"}, {"shoes", "socks"},
-		{"watch", nil}})
+		{"watch", ""}})
 	if err != nil {
 		log.Fatal("Toposort returned error:", err)
 	}

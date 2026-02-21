@@ -6,7 +6,7 @@ import (
 )
 
 // Edge represents a pair of vertexes.  Each vertex is an opaque type.
-type Edge [2]any
+type Edge[T comparable] [2]T
 
 // Toposort performs a topological sort of the DAG defined by given edges.
 //
@@ -20,15 +20,15 @@ type Edge [2]any
 //
 // Returns an ordered list of vertexes where each vertex occurs before any of
 // its destination vertexes.  An error is returned if a cycle is detected.
-func Toposort(edges []Edge) ([]any, error) {
+func Toposort[T comparable](edges []Edge[T]) ([]T, error) {
 	g, err := makeGraph(edges)
 	if err != nil {
 		return nil, err
 	}
-	sorted := make([]any, 0, len(g))
+	sorted := make([]T, 0, len(g))
 
 	// Create map of vertexes to incoming edge count, and set counts to 0
-	inDegree := make(map[any]int, len(g))
+	inDegree := make(map[T]int, len(g))
 	for n := range g {
 		inDegree[n] = 0
 	}
@@ -43,7 +43,7 @@ func Toposort(edges []Edge) ([]any, error) {
 	}
 
 	// Make a list next consisting of all vertexes u such that inDegree[u] = 0
-	var next []any
+	var next []T
 	for u, deg := range inDegree {
 		if deg == 0 {
 			next = append(next, u)
@@ -87,7 +87,7 @@ func Toposort(edges []Edge) ([]any, error) {
 
 // ToposortR is the same as Toposort with the order of the output reversed.
 // This has the same effect as changing the vertex order of each edge.
-func ToposortR(edges []Edge) ([]any, error) {
+func ToposortR[T comparable](edges []Edge[T]) ([]T, error) {
 	sorted, err := Toposort(edges)
 	if err != nil {
 		return nil, err
@@ -102,19 +102,20 @@ func ToposortR(edges []Edge) ([]any, error) {
 
 // makeGraph creates a map of source node to destination nodes.  An edge with
 // only one vertex is added to the graph, if it is not already in the graph.
-func makeGraph(edges []Edge) (map[any][]any, error) {
-	graph := make(map[any][]any, len(edges)+1)
+func makeGraph[T comparable](edges []Edge[T]) (map[T][]T, error) {
+	graph := make(map[T][]T, len(edges)+1)
+	var zero T
 	for i := range edges {
 		u, v := edges[i][0], edges[i][1]
 		if u == v {
 			return nil, errors.New("nodes in edge cannot be the same")
 		}
-		if u == nil {
+		if u == zero {
 			// Add vertex only (empty destination list)
 			if _, ok := graph[v]; !ok {
 				graph[v] = nil
 			}
-		} else if v == nil {
+		} else if v == zero {
 			if _, ok := graph[u]; !ok {
 				graph[u] = nil
 			}
