@@ -248,15 +248,6 @@ func validateClothing(t *testing.T, clothing []Edge[string], sorted []string) {
 	}
 }
 
-func index(slice []string, value string) int {
-	for p, v := range slice {
-		if v == value {
-			return p
-		}
-	}
-	return -1
-}
-
 func shuffle(x []Edge[string]) {
 	rand.Shuffle(len(x), func(i, j int) {
 		x[i], x[j] = x[j], x[i]
