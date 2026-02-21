@@ -38,7 +38,7 @@ $ go get github.com/gammazero/toposort
 ## Example
 
 ```go
-	sorted, err := Toposort([]Edge{
+	sorted, err := Toposort([]Edge[string]{
 		{"B", "D"}, {"D", "E"}, {"A", "B"}, {"A", "C"},
 		{"C", "D"}, {"F", "C"}, {"F", "E"}})
 	if err != nil {
