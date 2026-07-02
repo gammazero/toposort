@@ -2,7 +2,6 @@
 
 [![GoDoc](https://pkg.go.dev/badge/github.com/gammazero/toposort)](https://pkg.go.dev/github.com/gammazero/toposort)
 [![Build Status](https://github.com/gammazero/toposort/actions/workflows/go.yml/badge.svg)](https://github.com/gammazero/toposort/actions/workflows/go.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/gammazero/toposort)](https://goreportcard.com/report/github.com/gammazero/toposort)
 [![codecov](https://codecov.io/gh/gammazero/toposort/graph/badge.svg?token=iMxYb1bvjo)](https://codecov.io/gh/gammazero/toposort)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
